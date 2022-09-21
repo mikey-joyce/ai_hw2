@@ -2,7 +2,7 @@ from tokenize import ContStr
 
 x, y = 4, 5
 
-#0 indicates clean; 1 indicates dirty
+#0 indicates clean; 1 indicates dirty; 2 indicates starting location, might need to change this
 #data set for uniform cost tree search
 room1_UCT = [[0,1,0,0,0],
              [0,2,0,1,0],
