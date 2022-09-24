@@ -52,7 +52,7 @@ class Room:
  
         # Recur for all the vertices adjacent to this vertex
         for i in self.room[src]:
-            print(i)
+            #print(i)
             if i not in generated and i != root:
                 generated.append(i)
             if(self.DLS(i,target,maxDepth-1, path, generated, root)):
@@ -170,19 +170,13 @@ def algorithm(room, starting_position, path, target_state, maxDepth, generated, 
     while(room.dirty != 0):
         temp = [starting_position]
         if room.idt_search(starting_position, target_state, maxDepth, temp, generated, root) == True:
-            #print(path)
             temp.pop(0)
             i=len(temp)
             while(i!=0):
                 path.append(temp[i-1])
                 i -= 1
-            #print(path)
 
             starting_position = path[-1]
-            '''print("sp: ")
-            print(starting_position)
-            print()
-            print(room.map)'''
         else:
             print ("Error")
 
