@@ -1,10 +1,19 @@
-# Python program to print DFS traversal from a given graph
 from collections import defaultdict
- 
-# This class represents a directed graph using adjacency
-# list representation
+from time import process_time
+'''
+Developed by: Mikey Joyce 
+    for HW2 with group Jake Rogers and Roshan Neupane
+
+!!! DISCLAIMER !!!
+This code was adapted from https://www.geeksforgeeks.org/iterative-deepening-searchids-iterative-deepening-depth-first-searchiddfs/
+I used this link to help adapt this program and must give credit where credit is due.
+'''
+
+myTime = process_time()
+
+# This class represents our 20 room environment
 class Room:
-    def __init__(self, vertices, map, dirty):
+    def __init__(self, vertices, map):
         self.V = vertices
         self.room = defaultdict(list)
         self.map = map
@@ -17,43 +26,49 @@ class Room:
         self.suck = 0.6
         self.cost = 0.0
 
-        self.dirty = dirty
+        self.dirty = 0
+        self.getDirtyRooms()
  
+    # Returns the amount of dirty rooms at the start
+    def getDirtyRooms(self):
+        for row in self.map:
+            for node in row:
+                if node == 1:
+                    self.dirty += 1
+
     def addEdge(self, index, target):
         self.room[index].append(target)
 
-    # A function to perform a Depth-Limited search
-    # from given source 'src'
-    def DLS(self, src, target, maxDepth, path):
+    # A function to perform a Depth-Limited search from given source
+    def DLS(self, src, target, maxDepth, path, generated, root):
         if self.map[src[0]][src[1]] == target:
             self.map[src[0]][src[1]] = 0
             self.cost += self.suck
             self.dirty -= 1
             return True
  
-        # If reached the maximum depth, stop recursing.
+        # If reached the maximum depth then stop recursing.
         if maxDepth <= 0 : return False
  
         # Recur for all the vertices adjacent to this vertex
         for i in self.room[src]:
-            #print(i)
-            if(self.DLS(i,target,maxDepth-1, path)):
-                last = path[-1]
+            print(i)
+            if i not in generated and i != root:
+                generated.append(i)
+            if(self.DLS(i,target,maxDepth-1, path, generated, root)):
                 path.append(i)
-                #self.findCost(last, i)
                 return True
         return False
  
-    # IDDFS to search if target is reachable from v.
-    # It uses recursive DLS()
-    def idt_search(self, src, target, maxDepth, path):
-        # Repeatedly depth-limit search till the
-        # maximum depth
+    # Iterative Deepening Search
+    def idt_search(self, src, target, maxDepth, path, generated, root):
+        # Repeatedly depth-limit search till the maximum depth
         for i in range(maxDepth):
-            if (self.DLS(src, target, i, path)):
+            if (self.DLS(src, target, i, path, generated, root)):
                 return True
         return False
     
+    # This function finds the total cost that the algorithm took
     def findCost(self, last, current):
         if(current[0] == last[0]+1):
             self.cost += self.down
@@ -63,10 +78,10 @@ class Room:
             self.cost += self.right
         elif(current[1] == last[1]-1):
             self.cost += self.left
-
-def createRoom(map, dirty):
-# Create a graph given in the above diagram
-    room = Room (20, map, dirty)
+    
+def createRoom(map):
+    # Create an interconnected room structure given by the 20 room environment in the HW2 pdf
+    room = Room (20, map)
     room.addEdge((0,0), (0,1))
     room.addEdge((0,0), (1,0))
 
@@ -151,10 +166,10 @@ def createRoom(map, dirty):
 
     return room
 
-def algorithm(room, starting_position, path, target_state, maxDepth):
+def algorithm(room, starting_position, path, target_state, maxDepth, generated, root):
     while(room.dirty != 0):
         temp = [starting_position]
-        if room.idt_search(starting_position, target_state, maxDepth, temp) == True:
+        if room.idt_search(starting_position, target_state, maxDepth, temp, generated, root) == True:
             #print(path)
             temp.pop(0)
             i=len(temp)
@@ -173,29 +188,28 @@ def algorithm(room, starting_position, path, target_state, maxDepth):
 
     for i in range(len(path)-1):
         room.findCost(path[i], path[i+1])
-    print(room.cost)
-    print(path)
+    print("Cost: ", room.cost)
+    print("Path: ", path)
+    print("generated: ", generated)
 
-dirty = 3
 room1 = createRoom([[0,1,0,0,0],
                     [0,0,0,1,0],
                     [0,0,0,0,1],
-                    [0,0,0,0,0]],
-                    dirty)
+                    [0,0,0,0,0]])
 
-dirty = 4
 room2 = createRoom([[0,1,0,0,0],
                     [1,0,0,1,0],
                     [0,0,1,0,0],
-                    [0,0,0,0,0]],
-                    dirty)
+                    [0,0,0,0,0]])
 
-r1_starting_position = (1,1)
-r2_starting_position = (2,1)
-path1 = [r1_starting_position]
-path2 = [r2_starting_position]
+path1 = [(1,1)] #initialized with the starting position
+path2 = [(2,1)] #initialized with the starting position
+#keep track of expanded and generated nodes
+generated1, generated2 = [], []
 target_state = 1
 maxDepth = 8
 
-algorithm(room1, r1_starting_position, path1, target_state, maxDepth)
-algorithm(room2, r2_starting_position, path2, target_state, maxDepth)
+#algorithm(room1, path1[0], path1, target_state, maxDepth, generated1, path1[0])
+algorithm(room2, path2[0], path2, target_state, maxDepth, generated2, path2[0])
+stop = process_time()
+print("CPU Time: ", stop-myTime)
