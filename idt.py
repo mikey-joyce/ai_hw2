@@ -1,5 +1,6 @@
 from collections import defaultdict
 from time import process_time
+import sys
 '''
 Developed by: Mikey Joyce 
     for HW2 with group Jake Rogers and Roshan Neupane
@@ -203,7 +204,10 @@ generated1, generated2 = [], []
 target_state = 1
 maxDepth = 8
 
-#algorithm(room1, path1[0], path1, target_state, maxDepth, generated1, path1[0])
-algorithm(room2, path2[0], path2, target_state, maxDepth, generated2, path2[0])
+if(sys.argv[1] == "0"):
+    algorithm(room1, path1[0], path1, target_state, maxDepth, generated1, path1[0])
+else:
+    algorithm(room2, path2[0], path2, target_state, maxDepth, generated2, path2[0])
+
 stop = process_time()
 print("CPU Time: ", stop-myTime)
